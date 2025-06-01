@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<h1 class="mb-4">Notifications</h1>
+{% if notifications %}
+  <ul class="list-group">
+    {% for n in notifications %}
+      <li class="list-group-item d-flex justify-content-between align-items-center {% if n.status == 'unread' %}list-group-item-info{% elif n.status == 'deleted' %}bg-light text-muted text-decoration-line-through{% elif n.status == 'read' %}bg-light text-muted{% endif %}">
+        <span>
+          {% if n.url %}<a href="{{ n.url }}" class="{% if n.status == 'deleted' %}text-decoration-line-through text-muted{% endif %}">{{ n.message }}</a>{% else %}{{ n.message }}{% endif %}
+        </span>
+        <span class="small text-muted">{{ n.created_at|date:'M d, Y H:i' }}</span>
+        <span>
+          <form method="post" class="d-inline">
+            {% csrf_token %}
+            <input type="hidden" name="notif_id" value="{{ n.id }}">
+            {% if n.status == 'unread' %}
+              <button name="action" value="mark_read" class="btn btn-sm btn-outline-secondary">Mark Read</button>
+              <button name="action" value="delete" class="btn btn-sm btn-outline-danger">Delete</button>
+            {% elif n.status == 'read' %}
+              <button name="action" value="mark_unread" class="btn btn-sm btn-outline-primary">Mark Unread</button>
+              <button name="action" value="delete" class="btn btn-sm btn-outline-danger">Delete</button>
+            {% elif n.status == 'deleted' %}
+              <button name="action" value="restore" class="btn btn-sm btn-outline-success">Restore</button>
+            {% endif %}
+          </form>
+        </span>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No notifications.</p>
+{% endif %}
+{% endblock %}

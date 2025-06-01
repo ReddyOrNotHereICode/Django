@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load job_extras %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+<h1 class="mb-4">Applications</h1>
+{% if applications %}
+  <div class="table-responsive">
+    <form method="post">
+      {% csrf_token %}
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Job Title</th>
+            <th>Applicant</th>
+            <th>Cover Letter</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Save</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+          <tr>
+            <td>{{ app.job.title }}</td>
+            <td>{{ app.applicant.username }}</td>
+            <td>{{ app.cover_letter|truncatewords:20 }}</td>
+            <td>{{ app.created_at|date:'M d, Y H:i' }}</td>
+            <td>
+              {% if is_recruiter and app.status == 'pending' %}
+                <select name="status_{{ app.id }}" class="form-select status-dropdown" data-initial="{{ app.status }}">
+                  <option value="pending" {% if app.status == 'pending' %}selected{% endif %}>Pending</option>
+                  <option value="accepted" {% if app.status == 'accepted' %}selected{% endif %}>Accepted</option>
+                  <option value="denied" {% if app.status == 'denied' %}selected{% endif %}>Denied</option>
+                </select>
+              {% elif app.status == 'accepted' %}
+                <span class="badge bg-success">Accepted</span>
+              {% elif app.status == 'denied' %}
+                <span class="badge bg-danger">Denied</span>
+              {% else %}
+                <span class="badge bg-secondary">Pending</span>
+              {% endif %}
+              {% if app.processed_at %}<br><small>on {{ app.processed_at|date:'M d, Y H:i' }}</small>{% endif %}
+            </td>
+            <td>
+              {% if is_recruiter and app.status == 'pending' %}
+                <button type="submit" name="save_app" value="{{ app.id }}" class="btn btn-sm btn-primary save-btn" disabled>Save</button>
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+{% else %}
+  <p>No applications found.</p>
+{% endif %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.status-dropdown').forEach(function(select) {
+      var initial = select.getAttribute('data-initial');
+      var btn = select.closest('tr').querySelector('.save-btn');
+      select.addEventListener('change', function() {
+        if (select.value !== initial) {
+          btn.disabled = false;
+        } else {
+          btn.disabled = true;
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

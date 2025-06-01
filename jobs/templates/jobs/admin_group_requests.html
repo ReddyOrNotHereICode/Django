@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Admin Group Requests{% endblock %}
+{% block content %}
+<h1 class="mb-4">Group Membership Requests</h1>
+{% if notifications %}
+  <ul class="list-group">
+    {% for n in notifications %}
+      <li class="list-group-item">
+        {{ n.message }}
+        {% if n.url %}<a href="{{ n.url }}" class="btn btn-sm btn-outline-primary ms-2">View User</a>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No group requests.</p>
+{% endif %}
+{% endblock %}

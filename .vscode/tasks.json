@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Create jobs and accounts Django apps",
+			"command": "python manage.py startapp jobs && python manage.py startapp accounts",
+			"group": "build"
+		}
+	]
+}
